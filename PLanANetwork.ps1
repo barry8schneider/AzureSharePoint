@@ -6,6 +6,7 @@
     4. Create PlanASQL in Azure
     5. Configure SQL
     6. Create SharePoint Server
+    7. Configure Sharepoint
 
     Configure Client:
         enable-wsmancredssp -role client -delegatecomputer "*.cloudapp.net"
@@ -131,7 +132,7 @@ function CreatePlanADC
     #Configure machine specifics
     $instanceSize = @{"ExtraSmall" = "ExtraSmall"; "Small" = "Small"; "Medium" = "Medium"; "Large" = "Large"; "ExtraLarge" = "ExtraLarge"}
     $dcDNS = New-AzureDns -name "PlanADCDNS" -IPAddress "127.0.0.1"
-    $memberDNS = New-AzureDns -Name "PlanAMemberDNS" -IPAddress "10.10.220.4"
+    $memberDNS = New-AzureDns -Name "PlanAMemberDNS" -IPAddress "10.10.2.4"
     $machineName = "PlanADC"
     $serviceName = "PlanA"
 
@@ -139,9 +140,9 @@ function CreatePlanADC
     $location = @{"WestUS" = "West US"; "EastUS" = "East US"; "EastAsia" = "East Asia"; "SoutheastAsia" = "Southeast Asia"; "NorthEurope" = "North Europe"; `
         "WestEurope" = "West Europe"}
 
-    $affinityGroup = "PlanA-AffinityGroup"
-    $virtualNetwork = "PlacesToHack"
-    $subnet = "Comm"
+    $affinityGroup = "PlanA"
+    $virtualNetwork = "PlanANetwork"
+    $subnet = "PlanASu"
 
     # DC: Azure VM using defualt image
     $config = New-AzureVMConfig -Name $machineName -Label $machineName -ImageName $imageWin2k12 -InstanceSize $instanceSize.Small | 
@@ -275,7 +276,7 @@ function CreatePlanASQL
 
     #Configure Azure Specifics
     $imageWin2k12 = (Get-AzureVMImage | ? {$_.Label -match "SQL Server 2012 SP1 Enterprise On Windows Server 2012"}).imagename
-    $azureDnsIP = "10.10.220.4"
+    $azureDnsIP = "10.10.2.4"
 
     #Configure machine specificsC8
     $instanceSize = @{"ExtraSmall" = "ExtraSmall"; "Small" = "Small"; "Medium" = "Medium"; "Large" = "Large"; "ExtraLarge" = "ExtraLarge"}
@@ -285,9 +286,9 @@ function CreatePlanASQL
 
     #Setup Azure networking
     $location = @{"WestUS" = "West US"; "EastUS" = "East US"; "EastAsia" = "East Asia"; "SoutheastAsia" = "Southeast Asia"; "NorthEurope" = "North Europe"; "WestEurope" = "West Europe"}
-    $affinityGroup = "PlanA-AffinityGroup"
-    $virtualNetwork = "PlacesToHack"
-    $subnet = "Comm"
+    $affinityGroup = "PlanA"
+    $virtualNetwork = "PlanANetwork"
+    $subnet = "PlanASu"
 
     # SQL: Azure VM using default image
     $config = New-AzureVMConfig -Name $machineName -Label $machineName -ImageName $imageWin2k12 -InstanceSize $instanceSize.Large | 
@@ -602,7 +603,7 @@ function CreatePlanASP
 
     #Configure Azure Specifics
     $imageWin2k12 = (Get-AzureVMImage | ? {$_.Label -match "SharePoint Server 2013 Trial"}).imagename
-    $azureDnsIP = "10.10.220.4"
+    $azureDnsIP = "10.10.2.4"
 
     #Configure machine specificsC8
     $instanceSize = @{"ExtraSmall" = "ExtraSmall"; "Small" = "Small"; "Medium" = "Medium"; "Large" = "Large"; "ExtraLarge" = "ExtraLarge"}
@@ -612,9 +613,9 @@ function CreatePlanASP
 
     #Setup Azure networking
     $location = @{"WestUS" = "West US"; "EastUS" = "East US"; "EastAsia" = "East Asia"; "SoutheastAsia" = "Southeast Asia"; "NorthEurope" = "North Europe"; "WestEurope" = "West Europe"}
-    $affinityGroup = "PlanA-AffinityGroup"
-    $virtualNetwork = "PlacesToHack"
-    $subnet = "Comm"
+    $affinityGroup = "PlanA"
+    $virtualNetwork = "PlanANetwork"
+    $subnet = "PlanASu"
 
     # SQL: Azure VM using default image
     $config = New-AzureVMConfig -Name $machineName -Label $machineName -ImageName $imageWin2k12 -InstanceSize $instanceSize.ExtraLarge | 
@@ -626,6 +627,10 @@ function CreatePlanASP
     Get-AzureVM -ServiceName $serviceName -Name $machineName | Add-AzureEndpoint -Name "SharePoint" -PublicPort 80 -LocalPort 80 -Protocol tcp | Update-AzureVM
     Get-AzureVM -ServiceName $serviceName -Name $machineName | Add-AzureEndpoint -Name "SharePointCA" -PublicPort 2013 -LocalPort 2013 -Protocol tcp | Update-AzureVM
 }
+
+#endregion
+
+#region Step 7 Configure SharePoint
 
 function SPEnableCredSSP
 {

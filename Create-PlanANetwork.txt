@@ -1,0 +1,39 @@
+﻿## These are the steps to run the build. DO NOT EXECUTE THIS FILE... YET
+
+. .\PLanANetwork.ps1
+
+$password = "Pass@word"
+
+CreatePlanADC -password $password
+
+InstallPlanADCRemotePSCert
+
+DCPromoPlanADC -password $password
+
+ConfigureAD -password $password
+
+CreatePlanASQL -password $password
+
+SQLSetupDisks
+
+SQLEnableCredSSP -password $password
+
+FormatSQLDisks -serviceName $password
+
+SQLConfigureLogin -password $password
+
+SQLConfigureDefaultDisks -password $password
+
+SQLSetupNetwork -password $password
+
+SQLSetupFirewall -password $password
+
+CreatePlanASP -password $password
+
+SPEnableCredSSP -password $password
+
+SPConfigureFarm -password $password
+
+SPConfigureServices -password $password
+
+SPConfigureWeb -password $password
